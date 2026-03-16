@@ -17,7 +17,7 @@ const pool = new Pool({
 
 app.use(express.json());
 
-// Task 1: List All Players and Their Scores
+// Task 1: List all Players and Their Scores
 app.get('/players-scores', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -49,8 +49,25 @@ app.get('/top-players', async (req, res) => {
     }
 });
 
+// Task 3: Players Who Didn’t Play Any Games
+app.get('/inactive-players', async (req, res) => {
+    try {
+        const query = `
+            SELECT p.name 
+            FROM Players p
+            LEFT JOIN Scores s ON p.id = s.player_id
+            WHERE s.player_id IS NULL;
+        `;
+        const result = await pool.query(query);
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`http://localhost:3000/players-scores`);
     console.log(`http://localhost:3000/top-players`);
+    console.log(`http://localhost:3000/inactive-players`);
 });
