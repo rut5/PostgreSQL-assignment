@@ -17,7 +17,7 @@ const pool = new Pool({
 
 app.use(express.json());
 
-// Task 1: List all Players and Their Scores
+// Task 1: List all players and their scores
 app.get('/players-scores', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -32,7 +32,7 @@ app.get('/players-scores', async (req, res) => {
     }
 });
 
-// Task 2: High Scorers
+// Task 2: High scorers
 app.get('/top-players', async (req, res) => {
     try {
         const result = await pool.query(`
@@ -49,7 +49,7 @@ app.get('/top-players', async (req, res) => {
     }
 });
 
-// Task 3: Players Who Didn’t Play Any Games
+// Task 3: Players who didn’t play any games
 app.get('/inactive-players', async (req, res) => {
     try {
         const query = `
@@ -61,6 +61,42 @@ app.get('/inactive-players', async (req, res) => {
         const result = await pool.query(query);
         res.json(result.rows);
     } catch (err) {
+        console.error("Error in Task 3:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Task 4: Popular game genres
+app.get('/popular-genres', async (req, res) => {
+    try {
+        const query = `
+            SELECT g.genre, COUNT(s.id) AS play_count
+            FROM Games g
+            JOIN Scores s ON g.id = s.game_id
+            GROUP BY g.genre
+            ORDER BY play_count DESC;
+        `;
+        const result = await pool.query(query);
+        res.json(result.rows);
+    } catch (err) {
+        console.error("Error in Task 4:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Task 5: Recently joined players
+app.get('/recent-players', async (req, res) => {
+    try {
+        const query = `
+            SELECT name, join_date 
+            FROM Players 
+            WHERE join_date > NOW() - INTERVAL '30 days'
+            ORDER BY join_date DESC;
+        `;
+        const result = await pool.query(query);
+        res.json(result.rows);
+    } catch (err) {
+        console.error("Error in Task 5:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
@@ -70,4 +106,6 @@ app.listen(PORT, () => {
     console.log(`http://localhost:3000/players-scores`);
     console.log(`http://localhost:3000/top-players`);
     console.log(`http://localhost:3000/inactive-players`);
+    console.log(`http://localhost:3000/popular-genres`);
+    console.log(`http://localhost:3000/recent-players`);
 });
