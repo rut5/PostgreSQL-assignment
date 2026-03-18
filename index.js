@@ -1,6 +1,7 @@
 import express from 'express';
 import pg from 'pg';
 import dotenv from 'dotenv';
+import { z } from 'zod';
 
 dotenv.config();
 
@@ -109,3 +110,5 @@ app.listen(PORT, () => {
     console.log(`http://localhost:3000/popular-genres`);
     console.log(`http://localhost:3000/recent-players`);
 });
+
+console.log("Zod test:", !!z.string().parse("test"));
